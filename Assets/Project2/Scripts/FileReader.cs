@@ -8,6 +8,7 @@ using UnityEngine;
 
 public class FileManager : MonoBehaviour
 {
+    // Prefab references to put as points
     [SerializeField] private GameObject prefab_s;
     [SerializeField] private GameObject prefab_t;
 
@@ -67,6 +68,7 @@ public class FileManager : MonoBehaviour
 
     }
 
+    // Instantiates prefabs at locations to show outlay of line
     public void SpawnPoints(){
        
         for(int i= 0; i < points3D.Count; i++)
@@ -80,6 +82,7 @@ public class FileManager : MonoBehaviour
         }
     }
 
+    // Reads the files which are PointsCloud1 and PointsCloud2
     public void ReadPointCloud(string filePath)
     {
         points3D = new List<Vector3>();
@@ -93,6 +96,7 @@ public class FileManager : MonoBehaviour
 
                 for (int i = 0; i < num_points; i++)
                 {
+                    // Create vector with read values
                     string[] coordinates = reader.ReadLine()?.Split(' ');
                     float x = float.Parse(coordinates[0]);
                     float y = float.Parse(coordinates[1]);
@@ -140,6 +144,7 @@ public class FileManager : MonoBehaviour
 
     }
 
+    // Function to return source 3D points 
     public List<Vector3> getVectorList()
     {
         return points3D;

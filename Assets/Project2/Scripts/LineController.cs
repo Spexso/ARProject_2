@@ -4,7 +4,10 @@ using UnityEngine;
 
 public class LineController : MonoBehaviour
 {
+    // LineRenderer Reference
     private LineRenderer lr;
+
+    // Points to where lines will be rendered
     private Transform[] points;
 
     
@@ -13,9 +16,11 @@ public class LineController : MonoBehaviour
 
     private void Awake()
     {
+        // Gets LineRenderer Component on lr 
         lr = GetComponent<LineRenderer>();
     }
 
+    // Initializes points that will be rendered by LineRenderer
     public void SetUpLine(Transform[] points)
     {
         lr.positionCount = points.Length;

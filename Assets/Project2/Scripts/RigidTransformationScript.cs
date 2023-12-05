@@ -8,8 +8,10 @@ using MathNet.Numerics.LinearAlgebra.Double;
 
 public class RigidTransformationScript : MonoBehaviour
 {
-
+    // Transformed Points variable that will be sent to LineRenderer, to render
     [SerializeField] private Transform[] points;
+
+    // LineController Reference 
     [SerializeField] private LineController line;
 
 
@@ -61,14 +63,13 @@ public class RigidTransformationScript : MonoBehaviour
             transformArray[i] = newObject.transform;
         }
 
-        // Now, transformArray contains the Transform components corresponding to the List<Vector3>
-
-        // Example: Log the position of each Transform in the array
+        // Print transformed points to Console 
         foreach (Transform transform in transformArray)
         {
             Debug.Log("Transform Position: " + transform.position);
         }
 
+        // Set up points to render a line 
         line.SetUpLine(transformArray);
     }
 
@@ -76,11 +77,11 @@ public class RigidTransformationScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
 
     }
 
     // Qi - R*Pi = T
+    // H = (A - centroid_A)(B - centroid_B)^T 
     List<Vector3> RansacRigidTransform(List<Vector3> source, List<Vector3> target)
     {
         int numPoints = source.Count;
@@ -89,7 +90,7 @@ public class RigidTransformationScript : MonoBehaviour
 
         for (int iteration = 0; iteration < ransacIterations; iteration++)
         {
-            // Randomly select a minimal sample (e.g., 3 points) for the transformation
+            // Randomly select a minimal sample for the transformation
             List<Vector3> sampleSource = GetRandomSample(source, 3);
             List<Vector3> sampleTarget = GetRandomSample(target, 3);
 
@@ -169,13 +170,16 @@ public class RigidTransformationScript : MonoBehaviour
 
     }
 
-
+    // Calculate the covariance matrix between two sets of 3D points
     Matrix4x4 CalculateCovarianceMatrix(List<Vector3> source, List<Vector3> target, Vector3 centroidSource, Vector3 centroidTarget)
     {
+        // Initialize a 4x4 matrix to store the covariance matrix
         Matrix4x4 covarianceMatrix = Matrix4x4.zero;
 
+        // Loop through each vector in the source and target lists
         for (int i = 0; i < source.Count; i++)
         {
+            // Calculate the deviations from the centroids
             Vector3 sourceDeviation = source[i] - centroidSource;
             Vector3 targetDeviation = target[i] - centroidTarget;
 
@@ -183,6 +187,7 @@ public class RigidTransformationScript : MonoBehaviour
             {
                 for (int col = 0; col < 3; col++)
                 {
+                    // Update the covariance matrix by multiplying the deviations
                     covarianceMatrix[row, col] += sourceDeviation[row] * targetDeviation[col];
                 }
             }
@@ -195,9 +200,10 @@ public class RigidTransformationScript : MonoBehaviour
         return covarianceMatrix;
     }
 
-
+    // Count the number of inliers between two sets of 3D points based on a distance threshold
     int CountInliers(List<Vector3> originalPoints, List<Vector3> transformedPoints, float distanceThreshold)
     {
+        // Check if the point sets have the same number of points
         if (originalPoints.Count != transformedPoints.Count)
         {
             Debug.LogError("Point sets must have the same number of points.");
@@ -206,10 +212,13 @@ public class RigidTransformationScript : MonoBehaviour
 
         int inlierCount = 0;
 
+        // Iterate through corresponding points in the two sets
         for (int i = 0; i < originalPoints.Count; i++)
         {
+            // Calculate the Euclidean distance between original and transformed points
             float distance = Vector3.Distance(originalPoints[i], transformedPoints[i]);
 
+            // Check if the distance is below the specified threshold
             if (distance < distanceThreshold)
             {
                 inlierCount++;
@@ -219,21 +228,26 @@ public class RigidTransformationScript : MonoBehaviour
         return inlierCount;
     }
 
+    // Calculate the centroid of a list of 3D points
     Vector3 CalculateCentroid(List<Vector3> points)
     {
+        // Check if the input list is null or empty
         if (points == null || points.Count == 0)
         {
             Debug.LogError("Cannot calculate centroid for an empty or null list of points.");
             return Vector3.zero;
         }
 
+        // Initialize a vector to store the sum of all points
         Vector3 sum = Vector3.zero;
 
+        // Iterate through points to add them up to Sum vector
         foreach (Vector3 point in points)
         {
             sum += point;
         }
 
+        // Calculate the centroid by dividing the sum by the number of points
         return sum / points.Count;
     }
 
@@ -271,11 +285,13 @@ public class RigidTransformationScript : MonoBehaviour
 
         Quaternion rotationQuaternion = RotationMatrixToQuaternion(rotationMatrix);
 
+        // Normalize the matrix to prevent errors
         rotationQuaternion.Normalize();
 
         return rotationQuaternion;
     }
 
+    // Convert a 3x3 rotation matrix to a Unity Quaternion
     Quaternion RotationMatrixToQuaternion(DenseMatrix rotationMatrix)
     {
         // Extract quaternion elements from the rotation matrix
@@ -286,6 +302,7 @@ public class RigidTransformationScript : MonoBehaviour
         float y = (float)(rotationMatrix[0, 2] - rotationMatrix[2, 0]) * scale;
         float z = (float)(rotationMatrix[1, 0] - rotationMatrix[0, 1]) * scale;
 
+        // Create and return the quaternion using the calculated components
         return new Quaternion(x, y, z, w);
     }
 

@@ -4,8 +4,13 @@ using UnityEngine;
 
 public class LineButton : MonoBehaviour
 {
+    // GameObject Reference from scene
     [SerializeField] private GameObject LineRendererObj;
+
+    // LineRenderer Component Reference
     [SerializeField] private LineRenderer LineRenderer;
+
+    // Bool variable to check state of button
     private bool stateL = true;
 
     // Start is called before the first frame update
@@ -17,7 +22,6 @@ public class LineButton : MonoBehaviour
         if (LineRendererObj != null)
         {
             // Access the components or do other operations with the GameObject
-            // For example, get the Transform component
             LineRenderer = LineRendererObj.GetComponent<LineRenderer>();
         }
         else
@@ -26,7 +30,7 @@ public class LineButton : MonoBehaviour
         }
     }
 
-
+    // Function to hide rendered line on scene
     public void OnClickL()
     {
         Debug.Log("Line Button interacted!");
