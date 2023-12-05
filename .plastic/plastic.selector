@@ -1,0 +1,4 @@
+repository "Homework2@Spexso@cloud"
+  path "/"
+    br "/main"
+    co "/main"
